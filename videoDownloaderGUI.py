@@ -14,9 +14,11 @@ class VideoDownloaderGUI(QWidget):
     def __init__(self):
         super().__init__()
         self.vyt = VideoYT.__class__
+        self.choice = '0'
         self.x_size = 500
         self.y_size = 500
         self.url_textbox = QLineEdit(self)
+        self.file_name_textbox = QLineEdit(self)
         self.combo_with_preferences = QComboBox(self)
         self.init_gui()
 
@@ -36,26 +38,46 @@ class VideoDownloaderGUI(QWidget):
         self.url_textbox.move(int(self.x_size / 2 - self.url_textbox.width() / 2), 50)
 
         button_get_video = self.set_button(
-            self.x_size / 4, 90,
+            self.x_size / 4,
+            90,
             "Get this video",
-            "Get this video and choose your download preferences")
+            "Get this video and choose your download preferences"
+        )
         button_get_video.clicked.connect(self.get_video_from_url)
 
         button_get_audio = self.set_button(
-            self.x_size * 3 / 4, 90,
+            self.x_size * 3 / 4,
+            90,
             "Get just audio",
-            "Get only audio from video and choose your download preferences")
+            "Get only audio from video and choose your download preferences"
+        )
         button_get_audio.clicked.connect(self.get_audio_from_url)
 
         self.combo_with_preferences.resize(400, 40)
         self.combo_with_preferences.move(int(self.x_size/2 - self.combo_with_preferences.width()/2), 130)
 
+        self.file_name_textbox.resize(200, 20)
+        self.file_name_textbox.move(int(self.x_size/2 - self.file_name_textbox.width()/2), 200)
+
+        button_download = self.set_button(
+            self.x_size/2,
+            230,
+            "Download",
+            "Download and save with selected preferences"
+        )
+        button_download.clicked.connect(self.download_file)
+
+    def download_file(self):
+        self.vyt.download_video(self.file_name_textbox.text(), self.combo_with_preferences.currentData(), self.choice)
+
     def get_video_from_url(self):
+        self.choice = '1'
         url = self.url_textbox.text()
         self.vyt = VideoYT(url)
         by_resolution = self.vyt.get_video_resolutions()
         self.combo_with_preferences.clear()
         for x in by_resolution:
+            print(x)
             self.combo_with_preferences.addItem("Video itag: {0}, resolution: {1}, format: {2}\n"
                                                 .format(
                                                     re.search(pattern_itag, str(x)).group(1),
@@ -64,6 +86,7 @@ class VideoDownloaderGUI(QWidget):
                                                 re.search(pattern_itag, str(x)).group(1))
 
     def get_audio_from_url(self):
+        self.choice = '2'
         url = self.url_textbox.text()
         self.vyt = VideoYT(url)
         self.combo_with_preferences.clear()

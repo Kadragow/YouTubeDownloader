@@ -15,7 +15,7 @@ class VideoYT:
             os.rename(tmp_file, video_name + '.mp3')
 
     def get_video_resolutions(self):
-        return self.video.streams.itag_index
+        return self.video.streams.filter(type="video")
 
     def get_sound_only(self):
-        return self.video.streams.get_audio_only()
+        return self.video.streams.filter(type="audio")
